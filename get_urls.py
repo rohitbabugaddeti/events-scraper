@@ -12,15 +12,44 @@ def is_url_ok(url):
 def get(url):
     if (is_url_ok(url)):
         res=Request(url=url,headers=headers)
+        print("making request..")
         content=urlopen(res)
         parsable=BeautifulSoup(content,'html.parser')
         #print(parsable.prettify())
         #print(res)
+        print("parsing content...")
         a=parsable.find_all('a')
+        # import pprint
+        # pprint.pprint(a)
+        # print(len(a))
+        print("building urls...")
         urls=[each.get('href') for each in a if '/event/' in each.get('href')]
         urls=[url if "https" in url else url.replace('http','https') for url in urls]
         # print(urls)
         # print(len(urls))
+        print("building urls done.")
+        return urls
+    else:
+        print("URL may be dead/not working")
+
+def get_in(url):
+    if (is_url_ok(url)):
+        res=Request(url=url,headers=headers)
+        print("making request..")
+        content=urlopen(res)
+        parsable=BeautifulSoup(content,'html.parser')
+        print("parsing content..")
+        #print(parsable.prettify())
+        #print(res)
+        a=parsable.find_all('a',attrs={'class':""})
+        # import pprint
+        # pprint.pprint(a)
+        # print(len(a))
+        print("building urls...")
+        urls=["https://insider.in"+each.get('href') for each in a if '/event' in each.get('href')]
+        # print(urls)
+        # print(len(urls))
+        print("building urls done.")
         return urls
     else:
         print("URL may be dead/not working")
