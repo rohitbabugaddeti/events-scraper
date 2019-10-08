@@ -7,8 +7,12 @@ def ins(collName,doc):
     client = pymongo.MongoClient("mongodb://localhost:27017")
     db = client['events']
     coll = db[collName]
-    ids = coll.insert_many(doc)
-    print(ids.inserted_ids)
+    if len(doc)>1:
+        ids = coll.insert_many(doc)
+        print(ids.inserted_ids)
+    else:
+        ids=coll.insert_one(doc)
+        print(ids)
 def get_resp_list(urls):
     res = []
     l=len(urls)
@@ -19,6 +23,13 @@ def get_resp_list(urls):
     for url in urls[:max]:
         print('scraping '+url)
         res.append(scraper.parse_from_url(url)[0])
+    s=urls[0]
+    start=s.find('//')+len('//')
+    domain=s[start:s[start:].find('/')+start]
+    domain=domain.replace('.','_')
+    print(domain)
+    ins('interesting_urls',dict({domain:urls[:max]}))
+    ins("non_interesting_urls",dict({domain:urls[max:]}))
     return res
 
 def events_high():
@@ -31,7 +42,7 @@ def naadyoga():
     urls = get_urls.get("https://naadyogacouncil.com/")
     res=get_resp_list(urls)
     #pprint.pprint(res)
-    print(len(res))
+    #print(len(res))
     return res
 
 def insider():
@@ -46,6 +57,6 @@ res=insider()
 #res=events_high()
 #print(res[0])
 # ins('eventshigh',res)
-#res=naadyoga()
+res=naadyoga()
 #print(res[0])
 #ins('naadyoga',res)
