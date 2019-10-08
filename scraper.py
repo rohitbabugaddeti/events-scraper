@@ -1,8 +1,5 @@
 import requests
 import extruct
-import validators
-from pathlib import Path
-
 headers= {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 
 #method to check status of url
@@ -47,31 +44,9 @@ def parse_from_url(url):
     good_data={}
     if(is_url_ok(url)):
         response = requests.get(url, headers=headers)
-        import pprint
-        #pprint.pprint(response.text)
-        #print(response.text)
         data = extruct.extract(response.text, response.url)
-        #print(data)
         good_data=clean_data(data)
     else:
         print('URL may be Dead/Not Working !')
 
     return good_data
-
-def parse(obj):
-    if isinstance(obj,str): #if it is str object
-        if validators.url(obj): #if it is url
-            return parse_from_url(obj)
-        else: #it is file path
-            with open(obj, 'rt') as f:
-               data=extruct.extract(f.read())
-
-    elif hasattr(obj,'read'): #if it is and object with read attribute
-        data=extruct.extract(obj.read())
-    elif isinstance(obj,Path): #if it is a path instance
-        with obj.open(mode='rt') as fobj:
-            data=extruct.extract(fobj.read())
-    else:
-        raise TypeError('unexpected type encountered') #unexpected type
-    out = clean_data(data)
-    return out

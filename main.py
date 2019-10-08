@@ -42,7 +42,7 @@ def insider():
     return res
 
 res=insider()
-ins('insider',res)
+#ins('insider',res)
 #res=events_high()
 #print(res[0])
 # ins('eventshigh',res)
