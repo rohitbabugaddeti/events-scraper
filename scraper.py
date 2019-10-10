@@ -13,28 +13,34 @@ def clean_data(data):
     out=[]
     if data['json-ld']!=[]:
         for rec in data['json-ld']:
-            if rec['@type'] == 'Event':
-                d = rec.copy()
-                out.append(d)
+            try:
+                if rec['@type'] == 'Event':
+                    d = rec.copy()
+                    out.append(d)
+            except KeyError:
+                pass
 
     if data['microdata'] != []:
         for rec in data['microdata']:
-            if rec['type'] in ('http://schema.org/Event',
-                               'https://schema.org/Event'):
-                d = rec['properties'].copy()
-                #@context and @type to match json-ld style
-                if rec['type'][:6] == 'https:':
-                    d['@context'] = 'https://schema.org'
-                else:
-                    d['@context'] = 'http://schema.org'
-                d['@type'] = 'Event'
+            try:
+                if rec['type'] in ('http://schema.org/Event',
+                                   'https://schema.org/Event'):
+                    d = rec['properties'].copy()
+                    # @context and @type to match json-ld style
+                    if rec['type'][:6] == 'https:':
+                        d['@context'] = 'https://schema.org'
+                    else:
+                        d['@context'] = 'http://schema.org'
+                    d['@type'] = 'Event'
 
-                for key in d.keys():
-                    if isinstance(d[key], dict) and 'type' in d[key]:
-                        type_ = d[key].pop('type')
-                        d[key]['@type'] = type_.split('/')[3] #taking last part of url which holds type
+                    for key in d.keys():
+                        if isinstance(d[key], dict) and 'type' in d[key]:
+                            type_ = d[key].pop('type')
+                            d[key]['@type'] = type_.split('/')[3]  # taking last part of url which holds type
 
-                out.append(d)
+                    out.append(d)
+            except KeyError as ke:
+                print("Exception :",ke)
 
     return out
 
